@@ -5,32 +5,61 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+
+static void atualizar_filho_do_pai(Artista *pai, Artista *antigo, Artista *novo) {
+    if (pai == NULL) return;
+    if (pai->esquerda == antigo) pai->esquerda = novo;
+    else if (pai->direita == antigo) pai->direita = novo;
+}
+
+
+
 Artista *rotacao_esquerda_artista(Artista *raiz_subarvore)
 {
-  Artista *nova_raiz_subarvore = raiz_subarvore->direita;
-  raiz_subarvore->direita = nova_raiz_subarvore->esquerda;
-  if (nova_raiz_subarvore->esquerda != NULL)
-    nova_raiz_subarvore->esquerda->pai = raiz_subarvore;
-  nova_raiz_subarvore->pai = raiz_subarvore->pai;
-  nova_raiz_subarvore->esquerda = raiz_subarvore;
-  raiz_subarvore->pai = nova_raiz_subarvore;
-  nova_raiz_subarvore->cor = raiz_subarvore->cor;
-  raiz_subarvore->cor = VERMELHO;
-  return nova_raiz_subarvore;
+    if (raiz_subarvore == NULL || raiz_subarvore->direita == NULL) return raiz_subarvore;
+
+    Artista *nova_raiz_subarvore = raiz_subarvore->direita;
+    raiz_subarvore->direita = nova_raiz_subarvore->esquerda;
+    if (nova_raiz_subarvore->esquerda != NULL)
+        nova_raiz_subarvore->esquerda->pai = raiz_subarvore;
+
+    // Atualiza pai da nova raiz e também o ponteiro do pai antigo
+    Artista *pai_antigo = raiz_subarvore->pai;
+    nova_raiz_subarvore->pai = pai_antigo;
+    atualizar_filho_do_pai(pai_antigo, raiz_subarvore, nova_raiz_subarvore);
+
+    nova_raiz_subarvore->esquerda = raiz_subarvore;
+    raiz_subarvore->pai = nova_raiz_subarvore;
+
+    // troca cores preservando propriedade de LLRB/RB
+    nova_raiz_subarvore->cor = raiz_subarvore->cor;
+    raiz_subarvore->cor = VERMELHO;
+
+    return nova_raiz_subarvore;
 }
+
 
 Artista *rotacao_direita_artista(Artista *raiz_subarvore)
 {
-  Artista *nova_raiz_subarvore = raiz_subarvore->esquerda;
-  raiz_subarvore->esquerda = nova_raiz_subarvore->direita;
-  if (nova_raiz_subarvore->direita != NULL)
-    nova_raiz_subarvore->direita->pai = raiz_subarvore;
-  nova_raiz_subarvore->pai = raiz_subarvore->pai;
-  nova_raiz_subarvore->direita = raiz_subarvore;
-  raiz_subarvore->pai = nova_raiz_subarvore;
-  nova_raiz_subarvore->cor = raiz_subarvore->cor;
-  raiz_subarvore->cor = VERMELHO;
-  return nova_raiz_subarvore;
+    if (raiz_subarvore == NULL || raiz_subarvore->esquerda == NULL) return raiz_subarvore;
+
+    Artista *nova_raiz_subarvore = raiz_subarvore->esquerda;
+    raiz_subarvore->esquerda = nova_raiz_subarvore->direita;
+    if (nova_raiz_subarvore->direita != NULL)
+        nova_raiz_subarvore->direita->pai = raiz_subarvore;
+
+    Artista *pai_antigo = raiz_subarvore->pai;
+    nova_raiz_subarvore->pai = pai_antigo;
+    atualizar_filho_do_pai(pai_antigo, raiz_subarvore, nova_raiz_subarvore);
+
+    nova_raiz_subarvore->direita = raiz_subarvore;
+    raiz_subarvore->pai = nova_raiz_subarvore;
+
+    nova_raiz_subarvore->cor = raiz_subarvore->cor;
+    raiz_subarvore->cor = VERMELHO;
+
+    return nova_raiz_subarvore;
 }
 
 static Artista *minimo_artista(Artista *no)
@@ -362,4 +391,15 @@ void executar_experimento_busca(Artista *raiz)
   double tempo_gasto = (double)(fim - inicio) / CLOCKS_PER_SEC;
   printf("\n--- Fim do Experimento ---\n");
   printf("Tempo total gasto nas %d buscas: %f segundos.\n", num_buscas, tempo_gasto);
+}
+
+// Função wrapper para garantir raiz preta e pai NULL
+Artista *inserir_artista_root(Artista *raiz, char nome[], char estilo[])
+{
+    raiz = inserir_artista(raiz, nome, estilo);
+    if (raiz != NULL) {
+        raiz->cor = PRETO;
+        raiz->pai = NULL;
+    }
+    return raiz;
 }

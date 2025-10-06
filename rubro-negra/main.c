@@ -2,144 +2,221 @@
 #include "album.h"
 #include "musica.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void menu()
+{
+    printf("\n=====================================\n");
+    printf("   Biblioteca de Musica - Menu\n");
+    printf("=====================================\n");
+    printf("1 - Inserir artista\n");
+    printf("2 - Inserir album\n");
+    printf("3 - Inserir musica\n");
+    printf("4 - Exibir biblioteca completa\n");
+    printf("5 - Buscar artista\n");
+    printf("6 - Remover musica\n");
+    printf("7 - Remover album\n");
+    printf("8 - Remover artista\n");
+    printf("9 - Executar experimento de busca\n");
+    printf("0 - Sair\n");
+    printf("Escolha uma opcao: ");
+}
 
 int main()
 {
-  printf("Biblioteca de Música - Estrutura de Dados II\n\n");
-  Artista *raiz_artistas = NULL;
+    Artista *raiz_artistas = NULL;
+    int opcao;
 
-  // =======================================================
-  // ETAPA 1: INSERÇÃO DE ARTISTAS
-  // =======================================================
-  printf("--- ETAPA 1: INSERINDO ARTISTAS ---\n");
-  raiz_artistas = inserir_artista(raiz_artistas, "Queen", "Rock");
-  raiz_artistas = inserir_artista(raiz_artistas, "Pink Floyd", "Rock Progressivo");
-  raiz_artistas = inserir_artista(raiz_artistas, "Led Zeppelin", "Rock");
-  raiz_artistas = inserir_artista(raiz_artistas, "AC/DC", "Hard Rock");
-  raiz_artistas = inserir_artista(raiz_artistas, "The Beatles", "Rock");
-
-  if (raiz_artistas != NULL)
-  {
-    raiz_artistas->cor = PRETO;
-  }
-
-  exibir_artistas(raiz_artistas);
-  printf("-----------------------------------\n\n");
-
-  // =======================================================
-  // ETAPA 2: INSERÇÃO DE ÁLBUNS
-  // =======================================================
-  printf("--- ETAPA 2: ADICIONANDO ÁLBUNS ---\n");
-  Artista *artista_encontrado = buscar_artista(raiz_artistas, "Queen");
-  if (artista_encontrado != NULL)
-  {
-    inserir_album(artista_encontrado, "A Night at the Opera", 1975);
-    inserir_album(artista_encontrado, "News of the World", 1977);
-  }
-  artista_encontrado = buscar_artista(raiz_artistas, "Pink Floyd");
-  if (artista_encontrado != NULL)
-  {
-    inserir_album(artista_encontrado, "The Dark Side of the Moon", 1973);
-  }
-  printf("Álbuns adicionados com sucesso.\n");
-  printf("-----------------------------------\n\n");
-
-  // =======================================================
-  // ETAPA 3: INSERÇÃO DE MÚSICAS NOS ÁLBUNS
-  // =======================================================
-  printf("--- ETAPA 3: ADICIONANDO MÚSICAS ---\n");
-  artista_encontrado = buscar_artista(raiz_artistas, "Queen");
-  if (artista_encontrado != NULL)
-  {
-    Album *album_encontrado = buscar_album(artista_encontrado->albuns, "A Night at the Opera");
-    if (album_encontrado != NULL)
+    do
     {
-      printf("Adicionando músicas em 'A Night at the Opera'...\n");
-      inserir_musica_ordenado(&(album_encontrado->musicas), criar_musica("Bohemian Rhapsody", 6));
-      inserir_musica_ordenado(&(album_encontrado->musicas), criar_musica("Love of My Life", 4));
-    }
-  }
-  artista_encontrado = buscar_artista(raiz_artistas, "Pink Floyd");
-  if (artista_encontrado != NULL)
-  {
-    Album *album_encontrado = buscar_album(artista_encontrado->albuns, "The Dark Side of the Moon");
-    if (album_encontrado != NULL)
-    {
-      printf("Adicionando músicas em 'The Dark Side of the Moon'...\n");
-      inserir_musica_ordenado(&(album_encontrado->musicas), criar_musica("Time", 7));
-      inserir_musica_ordenado(&(album_encontrado->musicas), criar_musica("Money", 6));
-    }
-  }
-  printf("Músicas adicionadas com sucesso.\n");
-  printf("------------------------------------\n\n");
+        menu();
+        scanf("%d", &opcao);
+        getchar(); // consumir \n do buffer
 
-  // =======================================================
-  // ETAPA 4: EXIBIÇÃO DA BIBLIOTECA COMPLETA
-  // =======================================================
-  printf("--- ETAPA 4: EXIBINDO BIBLIOTECA COMPLETA ---\n");
-  artista_encontrado = buscar_artista(raiz_artistas, "Queen");
-  if (artista_encontrado != NULL)
-    exibir_albuns_do_artista(artista_encontrado);
+        if (opcao == 1)
+        {
+            char nome[100], estilo[50];
+            printf("Digite o nome do artista: ");
+            fgets(nome, sizeof(nome), stdin);
+            nome[strcspn(nome, "\n")] = '\0';
 
-  printf("\n");
+            printf("Digite o estilo do artista: ");
+            fgets(estilo, sizeof(estilo), stdin);
+            estilo[strcspn(estilo, "\n")] = '\0';
 
-  artista_encontrado = buscar_artista(raiz_artistas, "Pink Floyd");
-  if (artista_encontrado != NULL)
-    exibir_albuns_do_artista(artista_encontrado);
-  printf("---------------------------------------------\n\n");
+            raiz_artistas = inserir_artista(raiz_artistas, nome, estilo);
+            if (raiz_artistas != NULL)
+                raiz_artistas->cor = PRETO;
 
-  // =======================================================
-  // ETAPA 5: EXPERIMENTO DE BUSCA
-  // =======================================================
-  executar_experimento_busca(raiz_artistas);
+            printf("Artista '%s' inserido com sucesso!\n", nome);
+        }
+        else if (opcao == 2)
+        {
+            char nome_artista[100], titulo[100];
+            int ano;
 
-  // =======================================================
-  // ETAPA 6: TESTANDO REMOÇÃO DE MÚSICA
-  // =======================================================
-  printf("\n--- ETAPA 6: TESTANDO REMOÇÃO DE MÚSICA ---\n");
-  artista_encontrado = buscar_artista(raiz_artistas, "Queen");
-  if (artista_encontrado != NULL)
-  {
-    Album *album_encontrado = buscar_album(artista_encontrado->albuns, "A Night at the Opera");
-    if (album_encontrado != NULL)
-    {
-      printf("\nMúsicas ANTES da remoção:\n");
-      exibir_musicas_do_album(album_encontrado->musicas);
-      printf("\nRemovendo 'Love of My Life'...\n");
-      remover_musica(album_encontrado, "Love of My Life");
-      printf("\nMúsicas DEPOIS da remoção:\n");
-      exibir_musicas_do_album(album_encontrado->musicas);
-    }
-  }
-  printf("-------------------------------------------\n\n");
+            printf("Digite o nome do artista: ");
+            fgets(nome_artista, sizeof(nome_artista), stdin);
+            nome_artista[strcspn(nome_artista, "\n")] = '\0';
 
-  // =======================================================
-  // ETAPA 7: TESTANDO REMOÇÃO DE ÁLBUM
-  // =======================================================
-  printf("--- ETAPA 7: TESTANDO REMOÇÃO DE ÁLBUM ---\n");
-  artista_encontrado = buscar_artista(raiz_artistas, "Queen");
-  if (artista_encontrado != NULL)
-  {
-    printf("\nÁlbuns de 'Queen' ANTES da remoção:\n");
-    exibir_albuns_do_artista(artista_encontrado);
-    printf("\nRemovendo 'News of the World'...\n");
-    remover_album(artista_encontrado, "News of the World");
-    printf("\nÁlbuns de 'Queen' DEPOIS da remoção:\n");
-    exibir_albuns_do_artista(artista_encontrado);
-  }
-  printf("-------------------------------------------\n\n");
+            Artista *artista = buscar_artista(raiz_artistas, nome_artista);
+            if (artista == NULL)
+            {
+                printf("Artista nao encontrado.\n");
+            }
+            else
+            {
+                printf("Digite o título do álbum: ");
+                fgets(titulo, sizeof(titulo), stdin);
+                titulo[strcspn(titulo, "\n")] = '\0';
 
-  // =======================================================
-  // ETAPA 8: TESTANDO REMOÇÃO DE ARTISTA
-  // =======================================================
-  printf("--- ETAPA 8: TESTANDO REMOÇÃO DE ARTISTA ---\n");
-  printf("\nBiblioteca ANTES da remoção de 'Pink Floyd':\n");
-  exibir_artistas(raiz_artistas);
-  printf("\nRemovendo 'Pink Floyd'...\n");
-  remover_artista(&raiz_artistas, "Pink Floyd");
-  printf("\nBiblioteca DEPOIS da remoção:\n");
-  exibir_artistas(raiz_artistas);
-  printf("------------------------------------------\n\n");
+                printf("Digite o ano do album: ");
+                scanf("%d", &ano);
+                getchar();
 
-  return 0;
+                inserir_album(artista, titulo, ano);
+                printf("album '%s' adicionado ao artista '%s'.\n", titulo, nome_artista);
+            }
+        }
+        else if (opcao == 3)
+        {
+            char nome_artista[100], nome_album[100], titulo[100];
+            int minutos;
+
+            printf("Digite o nome do artista: ");
+            fgets(nome_artista, sizeof(nome_artista), stdin);
+            nome_artista[strcspn(nome_artista, "\n")] = '\0';
+
+            Artista *artista = buscar_artista(raiz_artistas, nome_artista);
+            if (artista == NULL)
+            {
+                printf("Artista nao encontrado.\n");
+            }
+            else
+            {
+                printf("Digite o nome do album: ");
+                fgets(nome_album, sizeof(nome_album), stdin);
+                nome_album[strcspn(nome_album, "\n")] = '\0';
+
+                Album *album = buscar_album(artista->albuns, nome_album);
+                if (album == NULL)
+                {
+                    printf("album nao encontrado.\n");
+                }
+                else
+                {
+                    printf("Digite o título da música: ");
+                    fgets(titulo, sizeof(titulo), stdin);
+                    titulo[strcspn(titulo, "\n")] = '\0';
+
+                    printf("Digite a duracao em minutos: ");
+                    scanf("%d", &minutos);
+                    getchar();
+
+                    inserir_musica_ordenado(&(album->musicas), criar_musica(titulo, minutos));
+                    album->qtd_musicas++;
+                    printf("Musica '%s' adicionada ao album '%s'.\n", titulo, nome_album);
+                }
+            }
+        }
+        else if (opcao == 4)
+        {
+            printf("\n--- Biblioteca Completa ---\n");
+            exibir_artistas(raiz_artistas);
+        }
+        else if (opcao == 5)
+        {
+            char nome[100];
+            printf("Digite o nome do artista para buscar: ");
+            fgets(nome, sizeof(nome), stdin);
+            nome[strcspn(nome, "\n")] = '\0';
+
+            Artista *encontrado = buscar_artista_com_caminho(raiz_artistas, nome);
+            if (encontrado)
+                printf("Artista '%s' encontrado!\n", nome);
+            else
+                printf("Artista '%s' nao encontrado.\n", nome);
+        }
+        else if (opcao == 6)
+        {
+            char nome_artista[100], nome_album[100], titulo[100];
+
+            printf("Digite o nome do artista: ");
+            fgets(nome_artista, sizeof(nome_artista), stdin);
+            nome_artista[strcspn(nome_artista, "\n")] = '\0';
+
+            Artista *artista = buscar_artista(raiz_artistas, nome_artista);
+            if (artista == NULL)
+            {
+                printf("Artista nao encontrado.\n");
+            }
+            else
+            {
+                printf("Digite o nome do álbum: ");
+                fgets(nome_album, sizeof(nome_album), stdin);
+                nome_album[strcspn(nome_album, "\n")] = '\0';
+
+                Album *album = buscar_album(artista->albuns, nome_album);
+                if (album == NULL)
+                {
+                    printf("Álbum nao encontrado.\n");
+                }
+                else
+                {
+                    printf("Digite o titulo da musica: ");
+                    fgets(titulo, sizeof(titulo), stdin);
+                    titulo[strcspn(titulo, "\n")] = '\0';
+
+                    remover_musica(album, titulo);
+                }
+            }
+        }
+        else if (opcao == 7)
+        {
+            char nome_artista[100], nome_album[100];
+
+            printf("Digite o nome do artista: ");
+            fgets(nome_artista, sizeof(nome_artista), stdin);
+            nome_artista[strcspn(nome_artista, "\n")] = '\0';
+
+            Artista *artista = buscar_artista(raiz_artistas, nome_artista);
+            if (artista == NULL)
+            {
+                printf("Artista nao encontrado.\n");
+            }
+            else
+            {
+                printf("Digite o nome do album: ");
+                fgets(nome_album, sizeof(nome_album), stdin);
+                nome_album[strcspn(nome_album, "\n")] = '\0';
+
+                remover_album(artista, nome_album);
+            }
+        }
+        else if (opcao == 8)
+        {
+            char nome[100];
+            printf("Digite o nome do artista a remover: ");
+            fgets(nome, sizeof(nome), stdin);
+            nome[strcspn(nome, "\n")] = '\0';
+
+            remover_artista(&raiz_artistas, nome);
+        }
+        else if (opcao == 9)
+        {
+            executar_experimento_busca(raiz_artistas);
+        }
+        else if (opcao == 0)
+        {
+            printf("Encerrando o programa...\n");
+        }
+        else
+        {
+            printf("Opcao invalida! Tente novamente.\n");
+        }
+
+    } while (opcao != 0);
+
+    return 0;
 }

@@ -219,7 +219,7 @@ void remover_album(Artista *artista, char titulo[])
 {
   if (artista == NULL || artista->albuns == NULL)
   {
-    printf("Artista ou lista de álbuns vazia.\n");
+    printf("Artista ou lista de albuns vazia.\n");
     return;
   }
 
@@ -244,7 +244,7 @@ void exibir_albuns_recursivo(Album *raiz)
   {
     exibir_albuns_recursivo(raiz->esquerda);
     const char *cor_str = (raiz->cor == VERMELHO) ? "VERMELHO" : "PRETO";
-    printf("  -> Álbum: %-25s | Ano: %d | Cor: %s\n", raiz->titulo, raiz->ano, cor_str);
+    printf("  -> album: %-25s | Ano: %d | Cor: %s\n", raiz->titulo, raiz->ano, cor_str);
     exibir_musicas_do_album(raiz->musicas);
     exibir_albuns_recursivo(raiz->direita);
   }
@@ -254,10 +254,10 @@ void exibir_albuns_do_artista(Artista *artista)
 {
   if (artista != NULL)
   {
-    printf("Álbuns de '%s':\n", artista->nome);
+    printf("albuns de '%s':\n", artista->nome);
     if (artista->albuns == NULL)
     {
-      printf("  -> Nenhum álbum cadastrado.\n");
+      printf("  -> Nenhum album cadastrado.\n");
     }
     else
     {

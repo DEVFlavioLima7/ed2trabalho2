@@ -14,23 +14,21 @@ Musica *criar_musica(char titulo[], int minutos)
 
 void inserir_musica_ordenado(Musica **lista_musicas, Musica *nova_musica)
 {
-
-  if (*lista_musicas == NULL || strcmp(nova_musica->titulo, (*lista_musicas)->titulo) < 0)
-  {
-    nova_musica->proximo = *lista_musicas;
-    *lista_musicas = nova_musica;
-  }
-  else
-  {
-
-    Musica *atual = *lista_musicas;
-    while (atual->proximo != NULL && strcmp(nova_musica->titulo, atual->proximo->titulo) > 0)
+    if (*lista_musicas == NULL || strcmp(nova_musica->titulo, (*lista_musicas)->titulo) < 0)
     {
-      atual = atual->proximo;
+        nova_musica->proximo = *lista_musicas;
+        *lista_musicas = nova_musica;
     }
-    nova_musica->proximo = atual->proximo;
-    atual->proximo = nova_musica;
-  }
+    else
+    {
+        Musica *atual = *lista_musicas;
+        while (atual->proximo != NULL && strcmp(nova_musica->titulo, atual->proximo->titulo) > 0)
+        {
+            atual = atual->proximo;
+        }
+        nova_musica->proximo = atual->proximo;
+        atual->proximo = nova_musica;
+    }
 }
 
 Musica *buscar_musica(Album *album, char titulo[])
