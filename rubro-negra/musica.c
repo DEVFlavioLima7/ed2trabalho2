@@ -120,18 +120,18 @@ void remover_musica(Album *album, char titulo[])
 
       free(atual);
       album->qtd_musicas--;
-      printf("  -> SUCESSO: Música '%s' removida.\n", titulo);
+      printf("  -> SUCESSO: Musica '%s' removida.\n", titulo);
     }
 
     else
     {
-      printf("  -> AVISO: Música '%s' não encontrada no álbum.\n", titulo);
+      printf("  -> AVISO: Música '%s' nao encontrada no album.\n", titulo);
     }
   }
 
   else
   {
-    printf("  -> AVISO: Não há músicas neste álbum para remover.\n");
+    printf("  -> AVISO: Nao ha músicas neste album para remover.\n");
   }
 
   return;

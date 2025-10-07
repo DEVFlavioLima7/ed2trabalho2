@@ -60,4 +60,10 @@ typedef struct Artista23 {
     struct Artista23 *pai;
 } Artista23;
 
+typedef struct {
+    char nome_promovido[100];
+    char estilo_promovido[50];
+    Artista23 *novo_no_dir;
+} Promocao;
+
 #endif
