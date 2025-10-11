@@ -12,7 +12,7 @@
 Artista23 *criar_no_artista_23(char nome[], char estilo[]);
 
 // Insere um artista na árvore 2-3
-Artista23 *inserir_artista_23(Artista23 *raiz, char *nome, char estilo[]);
+Artista23 *inserir_artista_23(Artista23 **raiz, char *nome, char estilo[]);
 
 // Busca um artista na árvore
 Artista23 *buscar_artista_23(Artista23 *raiz, char nome[]);
@@ -21,7 +21,7 @@ Artista23 *buscar_artista_23(Artista23 *raiz, char nome[]);
 void exibir_artistas_23(Artista23 *raiz);
 
 // Remove um artista da árvore
-Artista23 *remover_artista_23(Artista23 *raiz, char nome[]);
+Artista23 *remover_artista_23(Artista23 **raiz, char nome[]);
 
 // Libera toda a árvore
 void liberar_arvore_artistas_23(Artista23 **raiz);

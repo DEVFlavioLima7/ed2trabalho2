@@ -1,28 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "artista.h"
+#include "artista.h" // Assumi que o nome do seu cabeçalho é artista.h
 #include "album.h"
 
 // Função auxiliar para inserir artistas de teste
-Artista23 *popular_arvore_teste(Artista23 *raiz) {
-    raiz = inserir_artista_23(raiz, "Queen", "Rock");
-    raiz = inserir_artista_23(raiz, "AC/DC", "Rock");
-    raiz = inserir_artista_23(raiz, "The Beatles", "Pop/Rock");
-    raiz = inserir_artista_23(raiz, "Nirvana", "Grunge");
-    raiz = inserir_artista_23(raiz, "Pink Floyd", "Progressive Rock");
-    raiz = inserir_artista_23(raiz, "Eminem", "Rap");
-    raiz = inserir_artista_23(raiz, "Chico Buarque", "MPB");
-    raiz = inserir_artista_23(raiz, "Elis Regina", "MPB");
-    raiz = inserir_artista_23(raiz, "Led Zeppelin", "Rock");
-    raiz = inserir_artista_23(raiz, "Caetano Veloso", "MPB");
-    return raiz;
+// CORRIGIDO: Recebe Artista23 **raiz e NÃO retorna Artista23* (void é mais limpo)
+void popular_arvore_teste(Artista23 **raiz) {
+    // CORRIGIDO: Não há atribuição 'raiz = ...' aqui. O ponteiro é alterado internamente.
+    inserir_artista_23(raiz, "Queen", "Rock");
+    inserir_artista_23(raiz, "AC/DC", "Rock");
+    inserir_artista_23(raiz, "The Beatles", "Pop/Rock");
+    inserir_artista_23(raiz, "Nirvana", "Grunge");
+    inserir_artista_23(raiz, "Pink Floyd", "Progressive Rock");
+    inserir_artista_23(raiz, "Eminem", "Rap");
+    inserir_artista_23(raiz, "Chico Buarque", "MPB");
+    inserir_artista_23(raiz, "Elis Regina", "MPB");
+    inserir_artista_23(raiz, "Led Zeppelin", "Rock");
+    inserir_artista_23(raiz, "Caetano Veloso", "MPB");
+    // Removido: return *raiz;
 }
 
-// Menu de opções
+// Menu de opções (Mantido)
 void menu() {
     printf("\n=====================================\n");
-    printf("        ÁRVORE 2-3 DE ARTISTAS       \n");
+    printf("         ÁRVORE 2-3 DE ARTISTAS       \n");
     printf("=====================================\n");
     printf("1 - Inserir artista\n");
     printf("2 - Buscar artista\n");
@@ -55,7 +57,8 @@ int main() {
                 fgets(estilo, sizeof(estilo), stdin);
                 estilo[strcspn(estilo, "\n")] = '\0';
 
-                raiz = inserir_artista_23(raiz, nome, estilo);
+                // CORRIGIDO: Passa o endereço da raiz (&raiz). Remove a atribuição.
+                inserir_artista_23(&raiz, nome, estilo); 
                 printf("✅ Artista '%s' inserido com sucesso!\n", nome);
                 break;
 
@@ -81,7 +84,8 @@ int main() {
                 fgets(nome, sizeof(nome), stdin);
                 nome[strcspn(nome, "\n")] = '\0';
 
-                raiz = remover_artista_23(raiz, nome);
+                // CORRIGIDO: Passa o endereço da raiz (&raiz). Remove a atribuição.
+                remover_artista_23(&raiz, nome); 
                 printf("🗑️  Artista '%s' removido (se existia).\n", nome);
                 break;
 
@@ -96,7 +100,8 @@ int main() {
                 break;
 
             case 5:
-                raiz = popular_arvore_teste(raiz);
+                // CORRIGIDO: Passa o endereço da raiz (&raiz).
+                popular_arvore_teste(&raiz); 
                 printf("🎶 Árvore populada com artistas de teste!\n");
                 break;
 
@@ -114,6 +119,7 @@ int main() {
         }
     } while (opcao != 0);
 
+    // Libera a memória no final, passando o endereço de 'raiz'
     liberar_arvore_artistas_23(&raiz);
     return 0;
 }
