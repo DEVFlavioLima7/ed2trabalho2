@@ -43,50 +43,59 @@ Album *inserir_album_23(Album **lista_albuns, char titulo[], int ano) {
 /* ===================================================
    BUSCAR ÁLBUM
 =================================================== */
-Album *buscar_album_23(Album *lista_albuns, char titulo[]) {
+Album* buscar_album_23(Album *lista_albuns, char titulo[]) {
     Album *atual = lista_albuns;
     while (atual != NULL) {
         int cmp = strcmp(titulo, atual->titulo);
-        if (cmp == 0)
+        if (cmp == 0) {
+            // Álbum encontrado
             return atual;
-        else if (cmp < 0)
-            return NULL; // lista ordenada
-        atual = atual->proximo;
+        }
+        else if (cmp < 0) {
+            // Lista está ordenada, se o título procurado é menor que o atual,
+            // e ele não foi encontrado, ele não existe mais adiante.
+            return NULL;
+        }
+        atual = atual->proximo;  // Avança para o próximo álbum
     }
-    return NULL;
+    return NULL;  // Se não encontrou o álbum na lista
 }
+
 
 /* ===================================================
    REMOVER ÁLBUM
 =================================================== */
 void remover_album_23(Album **lista_albuns, char titulo[]) {
     if (*lista_albuns == NULL) {
-        printf("  -> AVISO: Nenhum álbum para remover.\n");
+        printf("  -> AVISO: Nenhum álbum para remover.\n");
         return;
     }
 
     Album *atual = *lista_albuns;
     Album *anterior = NULL;
-
+    
+    // Busca pelo álbum
     while (atual != NULL && strcmp(atual->titulo, titulo) != 0) {
         anterior = atual;
         atual = atual->proximo;
     }
 
     if (atual == NULL) {
-        printf("  -> AVISO: Álbum '%s' não encontrado.\n", titulo);
+        printf("  -> AVISO: Álbum '%s' não encontrado.\n", titulo);
         return;
     }
 
+    // Remoção: Atualiza o ponteiro da lista (anterior ou cabeça)
     if (anterior == NULL)
         *lista_albuns = atual->proximo;
     else
         anterior->proximo = atual->proximo;
 
+    // Libera a lista de músicas
     liberar_lista_musicas_23(&atual->musicas);
     free(atual);
 
-    printf("  -> SUCESSO: Álbum '%s' removido.\n", titulo);
+    printf("  -> SUCESSO: Álbum '%s' removido.\n", titulo);
 }
 
 /* ===================================================

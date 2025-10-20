@@ -23,6 +23,7 @@ void exibir_musicas_do_album_23(Musica *lista_musicas);
 void liberar_lista_musicas_23(Musica **lista_musicas);
 
 // Remove uma música de um álbum
-void remover_musica_23(Album *album, char titulo[]);
+// Dentro de musica.h
+void remover_musica_23(Musica **lista_musicas, char titulo[]);
 
 #endif // MUSICA_2_3_H

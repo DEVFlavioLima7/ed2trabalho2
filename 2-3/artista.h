@@ -29,4 +29,9 @@ void liberar_arvore_artistas_23(Artista23 **raiz);
 // Executa experimento de busca (opcional)
 void executar_experimento_busca_23(Artista23 *raiz);
 
+// Em artista.h (ou arquivo de testes)
+void popular_arvore_experimento(Artista23 **raiz);
+
+Artista23 *buscar_artista_23_com_caminho(Artista23 *raiz, char nome[], CaminhoBusca *caminho);
+
 #endif // ARTISTA_2_3_H

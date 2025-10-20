@@ -66,4 +66,18 @@ typedef struct {
     Artista23 *novo_no_dir;
 } Promocao;
 
+
+
+typedef struct {
+    char nome_no[100];
+    int chave_acessada; // 1 ou 2
+} Passo;
+
+#define MAX_PASSOS 50 // Número máximo de nós numa busca
+
+typedef struct {
+    Passo passos[MAX_PASSOS];
+    int count;
+} CaminhoBusca;
+
 #endif

@@ -77,31 +77,43 @@ void liberar_lista_musicas_23(Musica **lista_musicas)
     *lista_musicas = NULL;
 }
 
-void remover_musica_23(Album *album, char titulo[])
+void remover_musica_23(Musica **lista_musicas, char titulo[])
 {
-    if (album == NULL || album->musicas == NULL)
+    // CUIDADO: Este trecho pressupõe que a chamada externa cuida da verificação do Album* ser NULL.
+    // O ponteiro *lista_musicas pode ser NULL (lista vazia)
+    if (*lista_musicas == NULL)
     {
-        printf("  -> AVISO: Nao ha musicas neste album para remover.\n");
+        printf("  -> AVISO: Nao ha musicas neste album para remover.\n");
         return;
     }
 
-    Musica *atual = album->musicas;
+    Musica *atual = *lista_musicas;
     Musica *anterior = NULL;
+    
+    // Busca na lista de músicas (que é encadeada)
     while (atual != NULL && strcmp(atual->titulo, titulo) != 0)
     {
         anterior = atual;
         atual = atual->proximo;
     }
+    
+    // Não encontrou
     if (atual == NULL)
     {
-        printf("  -> AVISO: Música '%s' nao encontrada no álbum.\n", titulo);
+        printf("  -> AVISO: Musica '%s' nao encontrada no album.\n", titulo);
         return;
     }
 
-    if (anterior == NULL) album->musicas = atual->proximo;
-    else anterior->proximo = atual->proximo;
+    // Remoção: Atualiza o ponteiro do nó anterior ou a cabeça da lista
+    if (anterior == NULL) 
+        *lista_musicas = atual->proximo; // O ponteiro principal (cabeça) é atualizado
+    else 
+        anterior->proximo = atual->proximo;
 
+    // Você deve manter o controle de qtd_musicas no nó Album*, que não está aqui.
+    // Assumindo que a chamada que usa esta função cuida disso.
+    // if (album->qtd_musicas > 0) album->qtd_musicas--; 
+    
     free(atual);
-    if (album->qtd_musicas > 0) album->qtd_musicas--;
-    printf("  -> SUCESSO: Música '%s' removida.\n", titulo);
+    printf("  -> SUCESSO: Musica '%s' removida.\n", titulo);
 }
