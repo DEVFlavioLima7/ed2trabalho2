@@ -14,49 +14,39 @@ Musica *criar_musica(char titulo[], int minutos)
 
 void inserir_musica_ordenado(Musica **lista_musicas, Musica *nova_musica)
 {
-    if (*lista_musicas == NULL || strcmp(nova_musica->titulo, (*lista_musicas)->titulo) < 0)
+  if (*lista_musicas == NULL || strcmp(nova_musica->titulo, (*lista_musicas)->titulo) < 0)
+  {
+    nova_musica->proximo = *lista_musicas;
+    *lista_musicas = nova_musica;
+  }
+  else
+  {
+    Musica *atual = *lista_musicas;
+    while (atual->proximo != NULL && strcmp(nova_musica->titulo, atual->proximo->titulo) > 0)
     {
-        nova_musica->proximo = *lista_musicas;
-        *lista_musicas = nova_musica;
+      atual = atual->proximo;
     }
-    else
-    {
-        Musica *atual = *lista_musicas;
-        while (atual->proximo != NULL && strcmp(nova_musica->titulo, atual->proximo->titulo) > 0)
-        {
-            atual = atual->proximo;
-        }
-        nova_musica->proximo = atual->proximo;
-        atual->proximo = nova_musica;
-    }
+    nova_musica->proximo = atual->proximo;
+    atual->proximo = nova_musica;
+  }
 }
 
 Musica *buscar_musica(Album *album, char titulo[])
 {
-
   Musica *musica_encontrada = NULL;
 
   if (album != NULL && album->musicas != NULL)
   {
     Musica *atual = album->musicas;
 
-    while (atual != NULL)
+    while (atual != NULL && strcmp(titulo, atual->titulo) > 0)
     {
-      int comparacao = strcmp(titulo, atual->titulo);
-
-      if (comparacao == 0)
-      {
-
-        musica_encontrada = atual;
-        break;
-      }
-
-      if (comparacao < 0)
-      {
-        break;
-      }
-
       atual = atual->proximo;
+    }
+
+    if (atual != NULL && strcmp(titulo, atual->titulo) == 0)
+    {
+      musica_encontrada = atual;
     }
   }
 
@@ -67,7 +57,6 @@ void exibir_musicas_do_album(Musica *lista_musicas)
 {
   if (lista_musicas == NULL)
   {
-    printf("    -> Nenhuma música neste álbum.\n");
     return;
   }
   Musica *atual = lista_musicas;
@@ -120,18 +109,7 @@ void remover_musica(Album *album, char titulo[])
 
       free(atual);
       album->qtd_musicas--;
-      printf("  -> SUCESSO: Musica '%s' removida.\n", titulo);
     }
-
-    else
-    {
-      printf("  -> AVISO: Música '%s' nao encontrada no album.\n", titulo);
-    }
-  }
-
-  else
-  {
-    printf("  -> AVISO: Nao ha músicas neste album para remover.\n");
   }
 
   return;
