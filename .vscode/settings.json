@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "arvore.h": "c",
+        "bloco_memoria.h": "c"
+    }
+}
