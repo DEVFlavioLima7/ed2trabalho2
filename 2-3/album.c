@@ -68,7 +68,7 @@ Album *buscar_album_23(Album *lista_albuns, char titulo[])
     return album_encontrado;
 }
 
-void remover_album(Album **lista_albuns, char titulo[])
+void remover_album_23(Album **lista_albuns, char titulo[])
 {
 
     if (*lista_albuns != NULL)
