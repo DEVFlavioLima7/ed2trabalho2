@@ -14,12 +14,22 @@ void menu()
     printf("2 - Inserir album\n");
     printf("3 - Inserir musica\n");
     printf("4 - Exibir biblioteca completa\n");
-    printf("5 - Buscar artista\n");
+    printf("5 - Buscar...\n"); // Opção de busca principal
     printf("6 - Remover musica\n");
     printf("7 - Remover album\n");
     printf("8 - Remover artista\n");
     printf("9 - Executar experimento de busca\n");
     printf("0 - Sair\n");
+    printf("Escolha uma opcao: ");
+}
+
+void menu_busca()
+{
+    printf("\n--- Menu de Busca ---\n");
+    printf("1 - Buscar Artista\n");
+    printf("2 - Buscar Album\n");
+    printf("3 - Buscar Musica\n");
+    printf("0 - Voltar ao menu principal\n");
     printf("Escolha uma opcao: ");
 }
 
@@ -184,27 +194,113 @@ int main()
                 exibir_artistas(raiz_artistas);
             }
         }
-        else if (opcao == 5)
+        else if (opcao == 5) // --- NOVA SEÇÃO DE BUSCA ---
         {
-            if (raiz_artistas == NULL)
-            {
-                printf("A biblioteca esta vazia. Nao ha artistas para buscar.\n");
-                continue;
-            }
-            char nome[100];
-            printf("Digite o nome do artista para buscar: ");
-            ler_string(nome, sizeof(nome));
+            int op_busca;
+            menu_busca();
+            op_busca = ler_inteiro();
 
-            printf("Caminho da busca:\n");
-            Artista *encontrado = buscar_artista_com_caminho(raiz_artistas, nome);
-            if (encontrado)
+            if (op_busca == 1) // Buscar Artista
             {
-                printf("Artista '%s' encontrado!\n", nome);
-                exibir_albuns_do_artista(encontrado);
+                if (raiz_artistas == NULL)
+                {
+                    printf("A biblioteca esta vazia. Nao ha artistas para buscar.\n");
+                    continue;
+                }
+                char nome[100];
+                printf("Digite o nome do artista para buscar: ");
+                ler_string(nome, sizeof(nome));
+
+                printf("Caminho da busca:\n");
+                Artista *encontrado = buscar_artista_com_caminho(raiz_artistas, nome);
+                if (encontrado)
+                {
+                    printf("Artista '%s' encontrado!\n", nome);
+                    exibir_albuns_do_artista(encontrado);
+                }
+                else
+                {
+                    printf("Artista '%s' nao encontrado.\n", nome);
+                }
             }
-            else
+            else if (op_busca == 2) // Buscar Álbum
             {
-                printf("Artista '%s' nao encontrado.\n", nome);
+                if (raiz_artistas == NULL)
+                {
+                    printf("A biblioteca esta vazia.\n");
+                    continue;
+                }
+                char nome_artista[100], nome_album[100];
+                printf("Digite o nome do artista: ");
+                ler_string(nome_artista, sizeof(nome_artista));
+
+                Artista *artista = buscar_artista(raiz_artistas, nome_artista);
+                if (artista == NULL)
+                {
+                    printf("Artista '%s' nao encontrado.\n", nome_artista);
+                }
+                else
+                {
+                    printf("Digite o titulo do album para buscar: ");
+                    ler_string(nome_album, sizeof(nome_album));
+                    Album *album_encontrado = buscar_album(artista->albuns, nome_album);
+                    if (album_encontrado)
+                    {
+                        printf("Album '%s' encontrado para o artista '%s'!\n", nome_album, nome_artista);
+                        printf(" -> Ano: %d\n", album_encontrado->ano);
+                        printf(" -> Musicas:\n");
+                        exibir_musicas_do_album(album_encontrado->musicas);
+                    }
+                    else
+                    {
+                        printf("Album '%s' nao encontrado para o artista '%s'.\n", nome_album, nome_artista);
+                    }
+                }
+            }
+            else if (op_busca == 3) // Buscar Música
+            {
+                if (raiz_artistas == NULL)
+                {
+                    printf("A biblioteca esta vazia.\n");
+                    continue;
+                }
+                char nome_artista[100], nome_album[100], nome_musica[100];
+
+                printf("Digite o nome do artista: ");
+                ler_string(nome_artista, sizeof(nome_artista));
+                Artista *artista = buscar_artista(raiz_artistas, nome_artista);
+
+                if (artista == NULL)
+                {
+                    printf("Artista '%s' nao encontrado.\n", nome_artista);
+                }
+                else
+                {
+                    printf("Digite o titulo do album: ");
+                    ler_string(nome_album, sizeof(nome_album));
+                    Album *album = buscar_album(artista->albuns, nome_album);
+
+                    if (album == NULL)
+                    {
+                        printf("Album '%s' nao encontrado para o artista '%s'.\n", nome_album, nome_artista);
+                    }
+                    else
+                    {
+                        printf("Digite o titulo da musica para buscar: ");
+                        ler_string(nome_musica, sizeof(nome_musica));
+                        Musica *musica_encontrada = buscar_musica(album, nome_musica);
+
+                        if (musica_encontrada)
+                        {
+                            printf("Musica '%s' encontrada no album '%s'!\n", nome_musica, nome_album);
+                            printf(" -> Duracao: %d minutos.\n", musica_encontrada->minutos);
+                        }
+                        else
+                        {
+                            printf("Musica '%s' nao encontrada no album '%s'.\n", nome_musica, nome_album);
+                        }
+                    }
+                }
             }
         }
         else if (opcao == 6)
