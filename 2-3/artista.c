@@ -843,8 +843,7 @@ void executar_experimento_busca_23(Artista23 *raiz)
             a = buscar_artista_23_com_caminho(
                 raiz,
                 (char *)nomes_a_buscar[i],
-                caminho_ptr // Agora passamos o ponteiro (ou NULL)
-            );
+                caminho_ptr);
         }
         fim = clock();
 

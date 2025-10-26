@@ -307,8 +307,8 @@ int main()
         }
         else if (opcao == 9)
         {
-
-            printf("Funcionalidade de experimento nao implementada.\n");
+            popular_arvore_para_experimento(&raiz_artistas);
+            executar_experimento_busca(raiz_artistas);
         }
         else if (opcao == 0)
         {

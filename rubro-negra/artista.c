@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define MAX_PASSOS_RB 50
+
 static void atualizar_filho_do_pai(Artista *pai, Artista *antigo, Artista *novo)
 {
   if (pai == NULL)
@@ -366,32 +368,118 @@ Artista *inserir_artista_root(Artista *raiz, char nome[], char estilo[])
   return raiz;
 }
 
+// --------------------------------- Experimento------------------------------------
+typedef struct
+{
+  char nome_no[100];
+} PassoBuscaRB;
+
+typedef struct
+{
+  PassoBuscaRB passos[MAX_PASSOS_RB];
+  int count;
+} CaminhoBuscaRB;
+
+void registrar_passo_rb(CaminhoBuscaRB *caminho, Artista *no)
+{
+  if (caminho != NULL && caminho->count < MAX_PASSOS_RB)
+  {
+    strcpy(caminho->passos[caminho->count].nome_no, no->nome);
+    caminho->count++;
+  }
+}
+
+Artista *buscar_artista_registrando_caminho(Artista *raiz, char nome[], CaminhoBuscaRB *caminho)
+{
+  if (raiz == NULL)
+  {
+    return NULL;
+  }
+
+  registrar_passo_rb(caminho, raiz);
+
+  int comparacao = strcmp(nome, raiz->nome);
+  if (comparacao == 0)
+  {
+    return raiz; // Encontrado
+  }
+  else if (comparacao < 0)
+  {
+    return buscar_artista_registrando_caminho(raiz->esquerda, nome, caminho);
+  }
+  else
+  {
+    return buscar_artista_registrando_caminho(raiz->direita, nome, caminho);
+  }
+}
+
+void popular_arvore_para_experimento(Artista **raiz)
+{
+  char nome[100];
+  const char *estilo = "Rock Experimental";
+
+  // Insere 30 artistas genéricos (de "Artista 01" a "Artista 30")
+  for (int i = 1; i <= 30; i++)
+  {
+    sprintf(nome, "Artista %02d", i);
+    *raiz = inserir_artista_root(*raiz, nome, (char *)estilo);
+  }
+  printf("--- 30 Artistas de Experimento inseridos na Árvore Rubro-Negra ---\n");
+}
+
 void executar_experimento_busca(Artista *raiz)
 {
-  const char *lista_de_nomes[] = {
-      "Queen",
-      "AC/DC",
-      "Nirvana",
-      "The Beatles",
-      "Metallica"};
-  int num_buscas = sizeof(lista_de_nomes) / sizeof(lista_de_nomes[0]);
-  printf("--- Iniciando Experimento de Busca para %d Itens ---\n", num_buscas);
-  clock_t inicio = clock();
+  // Número de repetições para obter uma medição de tempo estável
+  const int REPETICOES = 10000;
+
+  // Lista dos 30 artistas que vamos buscar
+  const char *nomes_a_buscar[] = {
+      "Artista 01", "Artista 02", "Artista 03", "Artista 04", "Artista 05",
+      "Artista 06", "Artista 07", "Artista 08", "Artista 09", "Artista 10",
+      "Artista 11", "Artista 12", "Artista 13", "Artista 14", "Artista 15",
+      "Artista 16", "Artista 17", "Artista 18", "Artista 19", "Artista 20",
+      "Artista 21", "Artista 22", "Artista 23", "Artista 24", "Artista 25",
+      "Artista 26", "Artista 27", "Artista 28", "Artista 29", "Artista 30"};
+  int num_buscas = sizeof(nomes_a_buscar) / sizeof(nomes_a_buscar[0]);
+
+  printf("\n--- EXPERIMENTO DE BUSCA DETALHADA (Árvore Rubro-Negra) ---\n");
+  printf("| Artista    | Status     | Tempo Medio (ms) | Caminho Percorrido\n");
+  printf("|------------|------------|------------------|----------------------------------------\n");
+
   for (int i = 0; i < num_buscas; i++)
   {
-    printf("\nBuscando por: '%s'...\n", lista_de_nomes[i]);
-    Artista *encontrado = buscar_artista_com_caminho(raiz, (char *)lista_de_nomes[i]);
-    if (encontrado != NULL)
+    CaminhoBuscaRB caminho = {.count = 0};
+    clock_t inicio, fim;
+    double tempo_total;
+    Artista *encontrado = NULL;
+
+    // --- Medição de Tempo com Repetições ---
+    inicio = clock();
+    for (int k = 0; k < REPETICOES; k++)
     {
-      printf("... Artista '%s' ENCONTRADO.\n", lista_de_nomes[i]);
+      // Registra o caminho apenas na primeira execução para não afetar o tempo
+      CaminhoBuscaRB *caminho_ptr = (k == 0) ? &caminho : NULL;
+      encontrado = buscar_artista_registrando_caminho(raiz, (char *)nomes_a_buscar[i], caminho_ptr);
     }
-    else
+    fim = clock();
+
+    // --- Cálculo do Tempo Médio ---
+    // Multiplicamos por 1000.0 para converter para milissegundos (ms)
+    tempo_total = ((double)(fim - inicio) * 1000.0) / CLOCKS_PER_SEC;
+    double tempo_medio_por_busca = tempo_total / REPETICOES;
+
+    // --- Impressão dos Resultados ---
+    printf("| %-10s | %-10s | %-16.6f | ",
+           nomes_a_buscar[i],
+           (encontrado != NULL ? "Encontrado" : "Nao Encontrado"),
+           tempo_medio_por_busca);
+
+    // Imprime o caminho percorrido
+    for (int j = 0; j < caminho.count; j++)
     {
-      printf("... Artista '%s' NÃO ENCONTRADO.\n", lista_de_nomes[i]);
+      printf("%s%s", caminho.passos[j].nome_no, (j == caminho.count - 1 ? "" : " -> "));
     }
+    printf("\n");
   }
-  clock_t fim = clock();
-  double tempo_gasto = (double)(fim - inicio) / CLOCKS_PER_SEC;
-  printf("\n--- Fim do Experimento ---\n");
-  printf("Tempo total gasto nas %d buscas: %f segundos.\n", num_buscas, tempo_gasto);
+  printf("|------------|------------|------------------|----------------------------------------\n");
 }
