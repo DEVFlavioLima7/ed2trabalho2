@@ -286,6 +286,7 @@ void remover_artista(Artista **raiz, char nome[])
     }
   }
 }
+
 void exibir_artistas(Artista *raiz)
 {
   if (raiz != NULL)
@@ -363,4 +364,34 @@ Artista *inserir_artista_root(Artista *raiz, char nome[], char estilo[])
     raiz->pai = NULL;
   }
   return raiz;
+}
+
+void executar_experimento_busca(Artista *raiz)
+{
+  const char *lista_de_nomes[] = {
+      "Queen",
+      "AC/DC",
+      "Nirvana",
+      "The Beatles",
+      "Metallica"};
+  int num_buscas = sizeof(lista_de_nomes) / sizeof(lista_de_nomes[0]);
+  printf("--- Iniciando Experimento de Busca para %d Itens ---\n", num_buscas);
+  clock_t inicio = clock();
+  for (int i = 0; i < num_buscas; i++)
+  {
+    printf("\nBuscando por: '%s'...\n", lista_de_nomes[i]);
+    Artista *encontrado = buscar_artista_com_caminho(raiz, (char *)lista_de_nomes[i]);
+    if (encontrado != NULL)
+    {
+      printf("... Artista '%s' ENCONTRADO.\n", lista_de_nomes[i]);
+    }
+    else
+    {
+      printf("... Artista '%s' NÃO ENCONTRADO.\n", lista_de_nomes[i]);
+    }
+  }
+  clock_t fim = clock();
+  double tempo_gasto = (double)(fim - inicio) / CLOCKS_PER_SEC;
+  printf("\n--- Fim do Experimento ---\n");
+  printf("Tempo total gasto nas %d buscas: %f segundos.\n", num_buscas, tempo_gasto);
 }
