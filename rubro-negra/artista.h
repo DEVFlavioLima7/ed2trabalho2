@@ -13,6 +13,7 @@ void remover_artista(Artista **raiz, char nome[]);
 void exibir_artistas(Artista *raiz);
 Artista *buscar_artista(Artista *raiz, char nome[]);
 Artista *buscar_artista_com_caminho(Artista *raiz, char nome[]);
+
 void executar_experimento_busca(Artista *raiz);
 void popular_arvore_para_experimento(Artista **raiz);
 

@@ -401,7 +401,7 @@ Artista *buscar_artista_registrando_caminho(Artista *raiz, char nome[], CaminhoB
   int comparacao = strcmp(nome, raiz->nome);
   if (comparacao == 0)
   {
-    return raiz; // Encontrado
+    return raiz;
   }
   else if (comparacao < 0)
   {
@@ -418,7 +418,6 @@ void popular_arvore_para_experimento(Artista **raiz)
   char nome[100];
   const char *estilo = "Rock Experimental";
 
-  // Insere 30 artistas genéricos (de "Artista 01" a "Artista 30")
   for (int i = 1; i <= 30; i++)
   {
     sprintf(nome, "Artista %02d", i);
@@ -429,10 +428,9 @@ void popular_arvore_para_experimento(Artista **raiz)
 
 void executar_experimento_busca(Artista *raiz)
 {
-  // Número de repetições para obter uma medição de tempo estável
+
   const int REPETICOES = 10000;
 
-  // Lista dos 30 artistas que vamos buscar
   const char *nomes_a_buscar[] = {
       "Artista 01", "Artista 02", "Artista 03", "Artista 04", "Artista 05",
       "Artista 06", "Artista 07", "Artista 08", "Artista 09", "Artista 10",
@@ -453,28 +451,23 @@ void executar_experimento_busca(Artista *raiz)
     double tempo_total;
     Artista *encontrado = NULL;
 
-    // --- Medição de Tempo com Repetições ---
     inicio = clock();
     for (int k = 0; k < REPETICOES; k++)
     {
-      // Registra o caminho apenas na primeira execução para não afetar o tempo
+
       CaminhoBuscaRB *caminho_ptr = (k == 0) ? &caminho : NULL;
       encontrado = buscar_artista_registrando_caminho(raiz, (char *)nomes_a_buscar[i], caminho_ptr);
     }
     fim = clock();
 
-    // --- Cálculo do Tempo Médio ---
-    // Multiplicamos por 1000.0 para converter para milissegundos (ms)
     tempo_total = ((double)(fim - inicio) * 1000.0) / CLOCKS_PER_SEC;
     double tempo_medio_por_busca = tempo_total / REPETICOES;
 
-    // --- Impressão dos Resultados ---
     printf("| %-10s | %-10s | %-16.6f | ",
            nomes_a_buscar[i],
            (encontrado != NULL ? "Encontrado" : "Nao Encontrado"),
            tempo_medio_por_busca);
 
-    // Imprime o caminho percorrido
     for (int j = 0; j < caminho.count; j++)
     {
       printf("%s%s", caminho.passos[j].nome_no, (j == caminho.count - 1 ? "" : " -> "));
