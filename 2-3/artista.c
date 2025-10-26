@@ -294,7 +294,7 @@ Artista23 *get_inorder_predecessor(Artista23 *no)
 {
     if (no == NULL)
         return NULL;
-    // O predecessor está no nó folha mais à direita da subárvore esquerda.
+
     Artista23 *atual = no->esquerda;
     while (!eh_folha_23(atual))
     {
@@ -303,7 +303,6 @@ Artista23 *get_inorder_predecessor(Artista23 *no)
     return atual;
 }
 
-// Protótipo da função auxiliar de rebalanceamento
 StatusRemocao ajustar_apos_remocao(Artista23 **no);
 
 static StatusRemocao remover_rec_23(Artista23 **no, char nome[])
@@ -313,12 +312,11 @@ static StatusRemocao remover_rec_23(Artista23 **no, char nome[])
 
     Artista23 *n = *no;
 
-    // 1. Caso Base: Nó Folha
     if (eh_folha_23(n))
     {
         if (strcmp(nome, n->nome1) == 0)
         {
-            // Remove nome1
+
             if (n->num_chaves == 2)
             {
                 strcpy(n->nome1, n->nome2);
@@ -329,80 +327,74 @@ static StatusRemocao remover_rec_23(Artista23 **no, char nome[])
                 return OK;
             }
             else
-            { // Nó folha com 1 chave (após remoção, fica com 0)
+            {
                 free(n);
-                *no = NULL; // Deleta o nó
+                *no = NULL;
                 return UNDERFLOW;
             }
         }
         else if (n->num_chaves == 2 && strcmp(nome, n->nome2) == 0)
         {
-            // Remove nome2 (o nó fica com 1 chave)
+
             n->nome2[0] = '\0';
             n->estilo2[0] = '\0';
             n->num_chaves = 1;
             return OK;
         }
-        return OK; // Nome não encontrado na folha (deveria ser encontrado)
+        return OK;
     }
 
-    // 2. Nó Interno: Encontra o caminho
     StatusRemocao status;
-    int pos_filho_removido = -1; // 0=esq, 1=meio, 2=dir
+    int pos_filho_removido = -1;
 
     if (strcmp(nome, n->nome1) == 0)
     {
-        // Chave 1 encontrada no nó interno
+
         Artista23 *predecessor = get_inorder_predecessor(n);
 
-        // Substituir a chave pelo predecessor
         strcpy(n->nome1, predecessor->nome1);
         strcpy(n->estilo1, predecessor->estilo1);
 
-        // Remove a chave original do predecessor na folha
         status = remover_rec_23(&n->esquerda, predecessor->nome1);
         pos_filho_removido = 0;
     }
     else if (n->num_chaves == 2 && strcmp(nome, n->nome2) == 0)
     {
-        // Chave 2 encontrada no nó interno
-        Artista23 *predecessor = get_inorder_predecessor(n->meio); // Ou o sucessor do filho da direita
 
-        // Substituir a chave pelo predecessor
+        Artista23 *predecessor = get_inorder_predecessor(n->meio);
+
         strcpy(n->nome2, predecessor->nome1);
         strcpy(n->estilo2, predecessor->estilo1);
 
-        // Remove a chave original do predecessor na folha
         status = remover_rec_23(&n->meio, predecessor->nome1);
         pos_filho_removido = 1;
     }
     else if (strcmp(nome, n->nome1) < 0)
     {
-        // Busca na subárvore esquerda
+
         status = remover_rec_23(&n->esquerda, nome);
         pos_filho_removido = 0;
     }
     else if (n->num_chaves == 1 || strcmp(nome, n->nome2) < 0)
     {
-        // Busca na subárvore do meio
+
         status = remover_rec_23(&n->meio, nome);
         pos_filho_removido = 1;
     }
     else
     {
-        // Busca na subárvore direita
+
         status = remover_rec_23(&n->direita, nome);
         pos_filho_removido = 2;
     }
 
-    // 3. Rebalanceamento
     if (status == UNDERFLOW)
     {
-        // Passamos o ponteiro para o nó que teve um filho com underflow
+
         return ajustar_apos_remocao(no);
     }
 
-    return OK; // Não houve underflow
+    return OK;
 }
 
 Artista23 *remover_artista_23(Artista23 **raiz, char nome[])
@@ -410,7 +402,6 @@ Artista23 *remover_artista_23(Artista23 **raiz, char nome[])
     if (*raiz == NULL)
         return NULL;
 
-    // Verificamos se o artista existe antes de tentar remover
     if (buscar_artista_23(*raiz, nome) == NULL)
     {
         printf("AVISO: Artista '%s' não encontrado para remoção.\n", nome);
@@ -419,10 +410,9 @@ Artista23 *remover_artista_23(Artista23 **raiz, char nome[])
 
     StatusRemocao status = remover_rec_23(raiz, nome);
 
-    // Se o status for UNDERFLOW na raiz (apenas 1 chave e ela foi removida)
     if (status == UNDERFLOW && *raiz != NULL && (*raiz)->num_chaves == 0)
     {
-        // A raiz deve ser o único filho restante (esquerda ou meio, se houver)
+
         Artista23 *nova_raiz = (*raiz)->esquerda ? (*raiz)->esquerda : (*raiz)->meio;
         if (nova_raiz)
             nova_raiz->pai = NULL;
@@ -433,23 +423,15 @@ Artista23 *remover_artista_23(Artista23 **raiz, char nome[])
     return *raiz;
 }
 
-/* ===================================================
-    AJUSTE APÓS REMOÇÃO (Lógica de Rebalanceamento/Fusão)
-    Esta é a parte mais crítica e ajustada
-=================================================== */
-
 StatusRemocao ajustar_apos_remocao(Artista23 **raiz)
 {
-    // Esta função lida com o nó pai (*raiz) cujo filho ficou NULL (0 chaves)
-    // O filho com underflow já foi liberado e seu ponteiro no pai é NULL
 
     Artista23 *n = *raiz;
-    Artista23 *no_vazio = NULL; // Ponteiro que está NULL
+    Artista23 *no_vazio = NULL;
     Artista23 *irmao_esq = NULL;
     Artista23 *irmao_dir = NULL;
-    int pos_vazio = -1; // 0=esq, 1=meio, 2=dir
+    int pos_vazio = -1;
 
-    // Identifica o ponteiro NULL e os irmãos
     if (n->esquerda == NULL)
     {
         pos_vazio = 0;
@@ -461,7 +443,7 @@ StatusRemocao ajustar_apos_remocao(Artista23 **raiz)
     {
         pos_vazio = 1;
         irmao_esq = n->esquerda;
-        irmao_dir = n->direita; // Se existir
+        irmao_dir = n->direita;
     }
     else if (n->direita == NULL && n->num_chaves == 2)
     {
@@ -470,29 +452,24 @@ StatusRemocao ajustar_apos_remocao(Artista23 **raiz)
     }
     else
     {
-        return OK; // Não há underflow real a ser tratado
+        return OK;
     }
 
-    // TENTA REDISTRIBUIÇÃO
     if (pos_vazio == 0 && irmao_dir != NULL && irmao_dir->num_chaves == 2)
     {
-        // Redistribuição com o irmão da direita (n->meio)
+
         n->esquerda = criar_no_artista_23(n->nome1, n->estilo1);
         n->esquerda->num_chaves = 1;
 
-        // Promove a chave do meio
         strcpy(n->nome1, irmao_dir->nome1);
         strcpy(n->estilo1, irmao_dir->estilo1);
 
-        // Puxa a chave do irmão
         strcpy(irmao_dir->nome1, irmao_dir->nome2);
         strcpy(irmao_dir->estilo1, irmao_dir->estilo2);
         irmao_dir->num_chaves = 1;
         irmao_dir->nome2[0] = '\0';
         irmao_dir->estilo2[0] = '\0';
 
-        // Reatribui filhos (caso sejam nós internos)
-        // O filho mais à esquerda do irmao_dir (antigo) vai para o novo n->esquerda (novo)
         if (irmao_dir->esquerda)
             n->esquerda->meio = irmao_dir->esquerda;
         irmao_dir->esquerda = irmao_dir->meio;
@@ -503,19 +480,16 @@ StatusRemocao ajustar_apos_remocao(Artista23 **raiz)
     }
     else if (pos_vazio == 1 && irmao_esq != NULL && irmao_esq->num_chaves == 2)
     {
-        // Redistribuição com o irmão da esquerda (n->esquerda)
+
         n->meio = criar_no_artista_23(n->nome1, n->estilo1);
         n->meio->num_chaves = 1;
 
-        // Puxa a chave mais à direita do irmão (nome2)
         strcpy(n->nome1, irmao_esq->nome2);
         strcpy(n->estilo1, irmao_esq->estilo2);
         irmao_esq->num_chaves = 1;
         irmao_esq->nome2[0] = '\0';
         irmao_esq->estilo2[0] = '\0';
 
-        // Reatribui filhos
-        // O filho mais à direita do irmao_esq (antigo) vai para o novo n->meio (novo)
         n->meio->esquerda = irmao_esq->direita;
         irmao_esq->direita = NULL;
 
@@ -523,23 +497,19 @@ StatusRemocao ajustar_apos_remocao(Artista23 **raiz)
     }
     else if (pos_vazio == 1 && irmao_dir != NULL && n->num_chaves == 2 && irmao_dir->num_chaves == 2)
     {
-        // Redistribuição com o irmão da direita (n->direita) (Se n é 2-chave e pos_vazio=1)
+
         n->meio = criar_no_artista_23(n->nome2, n->estilo2);
         n->meio->num_chaves = 1;
 
-        // Promove a chave do meio (nome2)
         strcpy(n->nome2, irmao_dir->nome1);
         strcpy(n->estilo2, irmao_dir->estilo1);
 
-        // Puxa a chave do irmão
         strcpy(irmao_dir->nome1, irmao_dir->nome2);
         strcpy(irmao_dir->estilo1, irmao_dir->estilo2);
         irmao_dir->num_chaves = 1;
         irmao_dir->nome2[0] = '\0';
         irmao_dir->estilo2[0] = '\0';
 
-        // Reatribui filhos
-        // O filho mais à esquerda do irmao_dir (antigo) vai para o novo n->meio (novo)
         n->meio->direita = irmao_dir->esquerda;
         irmao_dir->esquerda = irmao_dir->meio;
         irmao_dir->meio = irmao_dir->direita;
@@ -549,43 +519,34 @@ StatusRemocao ajustar_apos_remocao(Artista23 **raiz)
     }
     else if (pos_vazio == 2 && irmao_esq != NULL && irmao_esq->num_chaves == 2)
     {
-        // Redistribuição com o irmão da esquerda (n->meio)
+
         n->direita = criar_no_artista_23(n->nome2, n->estilo2);
         n->direita->num_chaves = 1;
 
-        // Puxa a chave mais à direita do irmão (nome2)
         strcpy(n->nome2, irmao_esq->nome2);
         strcpy(n->estilo2, irmao_esq->estilo2);
         irmao_esq->num_chaves = 1;
         irmao_esq->nome2[0] = '\0';
         irmao_esq->estilo2[0] = '\0';
 
-        // Reatribui filhos
-        // O filho mais à direita do irmao_esq (antigo) vai para o novo n->direita (novo)
         n->direita->esquerda = irmao_esq->direita;
         irmao_esq->direita = NULL;
 
         return OK;
     }
 
-    // TENTA FUSÃO (Merge) - Se a redistribuição falhou
-    // Fusão sempre é feita com o irmão adjacente que tiver a menor chave,
-    // ou seja, se a posição vazia for 0 (esquerda), funde com o meio (1).
     if (pos_vazio == 0)
     {
-        // Fusão de esquerda (vazio) com meio (irmão)
-        // A chave n->nome1 desce para o n->meio (que se torna o novo n->esquerda)
+
         strcpy(irmao_dir->nome2, irmao_dir->nome1);
         strcpy(irmao_dir->estilo2, irmao_dir->estilo1);
         strcpy(irmao_dir->nome1, n->nome1);
         strcpy(irmao_dir->estilo1, n->estilo1);
         irmao_dir->num_chaves = 2;
 
-        // Puxa o ponteiro da esquerda para o meio (se não for folha)
         irmao_dir->direita = irmao_dir->meio;
         irmao_dir->meio = irmao_dir->esquerda;
 
-        // Atualiza o pai
         irmao_dir->pai = n->pai;
         n->esquerda = irmao_dir;
         n->meio = n->direita;
@@ -593,37 +554,31 @@ StatusRemocao ajustar_apos_remocao(Artista23 **raiz)
     }
     else if (pos_vazio == 1)
     {
-        // Fusão de meio (vazio) com esquerda (irmão)
-        // A chave n->nome1 desce para o n->esquerda
+
         strcpy(irmao_esq->nome2, n->nome1);
         strcpy(irmao_esq->estilo2, n->estilo1);
         irmao_esq->num_chaves = 2;
 
-        // O ponteiro do meio vai para a direita do n->esquerda
-        irmao_esq->direita = n->direita; // Se n->direita existe, é o filho direito do n->nome1
+        irmao_esq->direita = n->direita;
         if (irmao_esq->direita)
             irmao_esq->direita->pai = irmao_esq;
 
-        // Atualiza ponteiros do pai
         n->meio = n->direita;
         n->direita = NULL;
     }
     else if (pos_vazio == 2)
     {
-        // Fusão de direita (vazio) com meio (irmão)
-        // A chave n->nome2 desce para o n->meio
+
         strcpy(irmao_esq->nome2, n->nome2);
         strcpy(irmao_esq->estilo2, n->estilo2);
         irmao_esq->num_chaves = 2;
 
-        // O ponteiro da direita (n->direita) é NULL, então só precisa limpar o ponteiro
         n->direita = NULL;
     }
 
-    // Atualiza o nó pai (diminui o número de chaves)
     if (n->num_chaves == 2)
     {
-        // Se fundiu a chave 1 (pos_vazio=0 ou 1)
+
         if (pos_vazio == 0 || pos_vazio == 1)
         {
             strcpy(n->nome1, n->nome2);
@@ -632,37 +587,32 @@ StatusRemocao ajustar_apos_remocao(Artista23 **raiz)
             n->nome2[0] = '\0';
             n->estilo2[0] = '\0';
         }
-        // Se fundiu a chave 2 (pos_vazio=2)
+
         else if (pos_vazio == 2)
         {
             n->num_chaves = 1;
             n->nome2[0] = '\0';
             n->estilo2[0] = '\0';
         }
-        return OK; // Nó pai agora é um nó-2, OK
+        return OK;
     }
     else
     {
-        // Nó pai tinha 1 chave e perdeu-a (underflow)
+
         return UNDERFLOW;
     }
 }
 
-/* ===================================================
-    BUSCA
-=================================================== */
 Artista23 *buscar_artista_23(Artista23 *raiz, char nome[])
 {
     if (raiz == NULL)
         return NULL;
 
-    // Chaves no nó atual
     if (strcmp(nome, raiz->nome1) == 0)
         return raiz;
     if (raiz->num_chaves == 2 && strcmp(nome, raiz->nome2) == 0)
         return raiz;
 
-    // Decisão de busca
     if (strcmp(nome, raiz->nome1) < 0)
         return buscar_artista_23(raiz->esquerda, nome);
     else if (raiz->num_chaves == 1 || strcmp(nome, raiz->nome2) < 0)
@@ -671,15 +621,11 @@ Artista23 *buscar_artista_23(Artista23 *raiz, char nome[])
         return buscar_artista_23(raiz->direita, nome);
 }
 
-/* ===================================================
-    EXIBIÇÃO (In-Order)
-=================================================== */
 void exibir_artistas_23(Artista23 *raiz)
 {
     if (raiz == NULL)
         return;
 
-    // In-order traversal (esquerda, chave1, meio, chave2, direita)
     exibir_artistas_23(raiz->esquerda);
     printf("Artista: %-20s | Estilo: %-20s\n", raiz->nome1, raiz->estilo1);
     exibir_artistas_23(raiz->meio);
@@ -690,22 +636,15 @@ void exibir_artistas_23(Artista23 *raiz)
     }
 }
 
-/* ===================================================
-    LIBERAÇÃO
-=================================================== */
 void liberar_arvore_artistas_23(Artista23 **raiz)
 {
     if (*raiz == NULL)
         return;
 
-    // Liberação pós-ordem
     liberar_arvore_artistas_23(&(*raiz)->esquerda);
     liberar_arvore_artistas_23(&(*raiz)->meio);
     liberar_arvore_artistas_23(&(*raiz)->direita);
 
-    // Assumindo que essa função libera a lista de álbuns
-    // Você deve garantir que 'liberar_lista_albuns_23' está implementada
-    // e acessível (em 'estruturas_2_3.h')
     liberar_lista_albuns_23(&(*raiz)->albuns1);
     liberar_lista_albuns_23(&(*raiz)->albuns2);
 
@@ -717,7 +656,7 @@ void registrar_passo(CaminhoBusca *caminho, Artista23 *no, int chave)
 {
     if (caminho->count < MAX_PASSOS)
     {
-        // Assume que a busca sempre é feita pela chave 1 no nó (para simplificar a exibição do nó)
+
         if (chave == 1)
         {
             strcpy(caminho->passos[caminho->count].nome_no, no->nome1);
@@ -731,32 +670,24 @@ void registrar_passo(CaminhoBusca *caminho, Artista23 *no, int chave)
     }
 }
 
-// Busca que registra o caminho percorrido
-// Sua função de busca (em artista.c) DEVE MUDAR PARA:
 Artista23 *buscar_artista_23_com_caminho(Artista23 *raiz, char nome[], CaminhoBusca *caminho)
 {
     if (raiz == NULL)
         return NULL;
 
-    // --- Nova Verificação de Segurança (CORREÇÃO) ---
-    // A função auxiliar de registro agora faz a checagem:
-
-    // Procura na Chave 1
     if (strcmp(nome, raiz->nome1) == 0)
     {
         if (caminho != NULL)
             registrar_passo(caminho, raiz, 1);
         return raiz;
     }
-    // Procura na Chave 2
+
     if (raiz->num_chaves == 2 && strcmp(nome, raiz->nome2) == 0)
     {
         if (caminho != NULL)
             registrar_passo(caminho, raiz, 2);
         return raiz;
     }
-
-    // --- Navegação e Chamada Recursiva ---
 
     if (strcmp(nome, raiz->nome1) < 0)
     {
@@ -771,47 +702,39 @@ Artista23 *buscar_artista_23_com_caminho(Artista23 *raiz, char nome[], CaminhoBu
         return buscar_artista_23_com_caminho(raiz->meio, nome, caminho);
     }
     else
-    { // Deve ir para a direita (nó 3)
+    {
         if (caminho != NULL)
             registrar_passo(caminho, raiz, 2);
         return buscar_artista_23_com_caminho(raiz->direita, nome, caminho);
     }
 }
-// Depende de: inserir_artista_23(Artista23 **raiz, char nome[], char estilo[])
-// Depende de: Artista23 *buscar_artista_23(Artista23 *raiz, char nome[])
 
 void popular_arvore_experimento(Artista23 **raiz)
 {
     char nome[100];
     const char *estilo = "Teste Rock";
 
-    // Insere 30 artistas genéricos (de "Artista 01" a "Artista 30")
     for (int i = 1; i <= 30; i++)
     {
-        // Cria um nome formatado (ex: "Artista 05")
+
         sprintf(nome, "Artista %02d", i);
 
-        // Verifica se o artista já existe antes de inserir (melhor prática)
         if (buscar_artista_23(*raiz, nome) == NULL)
         {
-            // Chama a inserção real na árvore 2-3
+
             inserir_artista_23(raiz, nome, (char *)estilo);
         }
     }
     printf("--- 30 Artistas de Experimento Inseridos ---\n");
 }
 
-/* ===================================================
-    EXPERIMENTO DE BUSCA
-=================================================== */
-#include <time.h> // Essencial para clock() e CLOCKS_PER_SEC
+#include <time.h>
 
 void executar_experimento_busca_23(Artista23 *raiz)
 {
-    // Número de vezes que cada busca será repetida para forçar a medição
+
     const int REPETICOES = 10000;
 
-    // Lista de 30 nomes a serem buscados
     const char *nomes_a_buscar[] = {
         "Artista 01", "Artista 02", "Artista 03", "Artista 04", "Artista 05",
         "Artista 06", "Artista 07", "Artista 08", "Artista 09", "Artista 10",
@@ -832,12 +755,10 @@ void executar_experimento_busca_23(Artista23 *raiz)
         double tempo_total;
         Artista23 *a = NULL;
 
-        // --- EXECUÇÃO EM LOTE E MEDIÇÃO ---
         inicio = clock();
         for (int k = 0; k < REPETICOES; k++)
         {
-            // Para a medição, NÃO precisamos registrar o caminho em k > 0.
-            // Usamos um ponteiro temporário para não registrar o caminho, mas manter a chamada correta.
+
             CaminhoBusca *caminho_ptr = (k == 0) ? &caminho : NULL;
 
             a = buscar_artista_23_com_caminho(
@@ -847,17 +768,14 @@ void executar_experimento_busca_23(Artista23 *raiz)
         }
         fim = clock();
 
-        // --- CÁLCULO DO TEMPO MÉDIO ---
         tempo_total = (double)(fim - inicio) * 1000.0 / CLOCKS_PER_SEC;
         double tempo_medio_por_busca = tempo_total / REPETICOES;
 
-        // --- IMPRESSÃO DOS RESULTADOS ---
         printf("| %-8s | %-10s | %-16.6f | ",
                nomes_a_buscar[i],
                (a != NULL ? "Encontrado" : "Falha"),
                tempo_medio_por_busca);
 
-        // Imprime a sequência de nós visitados
         for (int j = 0; j < caminho.count; j++)
         {
             printf("%s%s", caminho.passos[j].nome_no, (j == caminho.count - 1 ? "" : " -> "));

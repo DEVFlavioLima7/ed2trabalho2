@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 void menu()
 {
     printf("\n=====================================\n");
@@ -26,7 +25,7 @@ void menu()
 
 int main()
 {
-    // Usamos Artista23* (A estrutura correta para a arvore 2-3)
+
     Artista23 *raiz_artistas = NULL;
     int opcao;
 
@@ -34,9 +33,9 @@ int main()
     {
         menu();
         scanf("%d", &opcao);
-        getchar(); // consumir \n do buffer
+        getchar();
 
-        if (opcao == 1) // Inserir Artista
+        if (opcao == 1)
         {
             char nome[100], estilo[50];
             printf("Digite o nome do artista: ");
@@ -47,24 +46,22 @@ int main()
             fgets(estilo, sizeof(estilo), stdin);
             estilo[strcspn(estilo, "\n")] = '\0';
 
-            // CORREÇÃO: Passa o endereço da raiz (&raiz_artistas)
-            inserir_artista_23(&raiz_artistas, nome, estilo); 
-            // A cor PRETO não se aplica, mas inserção está correta.
+            inserir_artista_23(&raiz_artistas, nome, estilo);
+
             printf("Artista '%s' inserido com sucesso!\n", nome);
         }
-       else if (opcao == 2) // Inserir Album
+        else if (opcao == 2)
         {
             char nome_artista[100], titulo[100];
             int ano;
 
             printf("Digite o nome do artista: ");
             fgets(nome_artista, sizeof(nome_artista), stdin);
-            nome_artista[strcspn(nome_artista, "\n")] = '\0';  // Remove o '\n' de fim de linha
+            nome_artista[strcspn(nome_artista, "\n")] = '\0';
 
-            printf("Nome do artista: %s\n", nome_artista); // Print para depuração
+            printf("Nome do artista: %s\n", nome_artista);
 
-            // Busca na árvore 2-3
-            Artista23 *artista = buscar_artista_23(raiz_artistas, nome_artista); 
+            Artista23 *artista = buscar_artista_23(raiz_artistas, nome_artista);
             if (artista == NULL)
             {
                 printf("Artista nao encontrado.\n");
@@ -73,26 +70,29 @@ int main()
             {
                 printf("Digite o título do álbum: ");
                 fgets(titulo, sizeof(titulo), stdin);
-                titulo[strcspn(titulo, "\n")] = '\0';  // Remove o '\n' de fim de linha
+                titulo[strcspn(titulo, "\n")] = '\0';
 
-                printf("Título do álbum: %s\n", titulo); // Print para depuração
+                printf("Título do álbum: %s\n", titulo);
 
                 printf("Digite o ano do album: ");
-                while (scanf("%d", &ano) != 1) {
+                while (scanf("%d", &ano) != 1)
+                {
                     printf("Entrada inválida! Digite um número para o ano: ");
-                    while (getchar() != '\n'); // Limpa o buffer de entrada
+                    while (getchar() != '\n')
+                        ;
                 }
 
-                while (getchar() != '\n'); // Remove o '\n' residual
+                while (getchar() != '\n')
+                    ;
 
-                printf("Ano do álbum: %d\n", ano); // Print para depuração
+                printf("Ano do álbum: %d\n", ano);
 
                 inserir_album_23(&(artista->albuns1), titulo, ano);
                 printf("Álbum '%s' adicionado ao artista '%s'.\n", titulo, nome_artista);
             }
         }
 
-        else if (opcao == 3) // Inserir Musica
+        else if (opcao == 3)
         {
             char nome_artista[100], nome_album[100], titulo[100];
             int minutos;
@@ -112,8 +112,7 @@ int main()
                 fgets(nome_album, sizeof(nome_album), stdin);
                 nome_album[strcspn(nome_album, "\n")] = '\0';
 
-                // CORREÇÃO (1): Passa a lista Artista23->albuns1 para a busca de album
-                Album *album = buscar_album_23(artista->albuns1, nome_album); // <--- CORRIGIDO
+                Album *album = buscar_album_23(artista->albuns1, nome_album);
                 if (album == NULL)
                 {
                     printf("album nao encontrado.\n");
@@ -134,12 +133,12 @@ int main()
                 }
             }
         }
-        else if (opcao == 4) // Exibir Biblioteca Completa
+        else if (opcao == 4)
         {
             printf("\n--- Biblioteca Completa ---\n");
             exibir_artistas_23(raiz_artistas);
         }
-        else if (opcao == 5) // Buscar Artista
+        else if (opcao == 5)
         {
             char nome[100];
             printf("Digite o nome do artista para buscar: ");
@@ -152,7 +151,7 @@ int main()
             else
                 printf("Artista '%s' nao encontrado.\n", nome);
         }
-        else if (opcao == 6) // Remover Musica
+        else if (opcao == 6)
         {
             char nome_artista[100], nome_album[100], titulo[100];
 
@@ -171,8 +170,7 @@ int main()
                 fgets(nome_album, sizeof(nome_album), stdin);
                 nome_album[strcspn(nome_album, "\n")] = '\0';
 
-                // CORREÇÃO (2): Passa a lista Artista23->albuns1 para a busca de album
-                Album *album = buscar_album_23(artista->albuns1, nome_album); // <--- CORRIGIDO
+                Album *album = buscar_album_23(artista->albuns1, nome_album);
                 if (album == NULL)
                 {
                     printf("Álbum nao encontrado.\n");
@@ -183,14 +181,13 @@ int main()
                     fgets(titulo, sizeof(titulo), stdin);
                     titulo[strcspn(titulo, "\n")] = '\0';
 
-                    // Esta linha requer que musica.h tenha a assinatura: void remover_musica_23(Musica **lista_musicas, char titulo[]);
                     remover_musica_23(&(album->musicas), titulo);
                 }
             }
         }
-        else if (opcao == 7) // Remover Album
+        else if (opcao == 7)
         {
-           char nome_artista[100], nome_album[100];
+            char nome_artista[100], nome_album[100];
 
             printf("Digite o nome do artista: ");
             fgets(nome_artista, sizeof(nome_artista), stdin);
@@ -210,20 +207,19 @@ int main()
                 remover_album_23(&(artista->albuns1), nome_album);
             }
         }
-        else if (opcao == 8) // Remover Artista
+        else if (opcao == 8)
         {
             char nome[100];
             printf("Digite o nome do artista a remover: ");
             fgets(nome, sizeof(nome), stdin);
             nome[strcspn(nome, "\n")] = '\0';
 
-            // CORREÇÃO: Passa o endereço da raiz (&raiz_artistas)
             remover_artista_23(&raiz_artistas, nome);
         }
-        else if (opcao == 9) 
-        // Executar Experimento
+        else if (opcao == 9)
+
         {
-            popular_arvore_experimento(&raiz_artistas); 
+            popular_arvore_experimento(&raiz_artistas);
             executar_experimento_busca_23(raiz_artistas);
         }
         else if (opcao == 0)
@@ -237,7 +233,6 @@ int main()
 
     } while (opcao != 0);
 
-    // Liberação no final do programa
     liberar_arvore_artistas_23(&raiz_artistas);
 
     return 0;

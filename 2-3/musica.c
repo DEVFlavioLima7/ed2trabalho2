@@ -5,10 +5,11 @@
 
 Musica *criar_musica_23(char titulo[], int minutos)
 {
-    Musica *m = (Musica*) malloc(sizeof(Musica));
-    if (!m) return NULL;
-    strncpy(m->titulo, titulo, sizeof(m->titulo)-1);
-    m->titulo[sizeof(m->titulo)-1] = '\0';
+    Musica *m = (Musica *)malloc(sizeof(Musica));
+    if (!m)
+        return NULL;
+    strncpy(m->titulo, titulo, sizeof(m->titulo) - 1);
+    m->titulo[sizeof(m->titulo) - 1] = '\0';
     m->minutos = minutos;
     m->proximo = NULL;
     return m;
@@ -16,7 +17,8 @@ Musica *criar_musica_23(char titulo[], int minutos)
 
 void inserir_musica_ordenado_23(Musica **lista_musicas, Musica *nova_musica)
 {
-    if (lista_musicas == NULL || nova_musica == NULL) return;
+    if (lista_musicas == NULL || nova_musica == NULL)
+        return;
 
     if (*lista_musicas == NULL || strcmp(nova_musica->titulo, (*lista_musicas)->titulo) < 0)
     {
@@ -37,13 +39,16 @@ void inserir_musica_ordenado_23(Musica **lista_musicas, Musica *nova_musica)
 
 Musica *buscar_musica_23(Album *album, char titulo[])
 {
-    if (album == NULL || album->musicas == NULL) return NULL;
+    if (album == NULL || album->musicas == NULL)
+        return NULL;
     Musica *atual = album->musicas;
     while (atual != NULL)
     {
         int cmp = strcmp(titulo, atual->titulo);
-        if (cmp == 0) return atual;
-        if (cmp < 0) return NULL; // lista ordenada por título
+        if (cmp == 0)
+            return atual;
+        if (cmp < 0)
+            return NULL;
         atual = atual->proximo;
     }
     return NULL;
@@ -66,7 +71,8 @@ void exibir_musicas_do_album_23(Musica *lista_musicas)
 
 void liberar_lista_musicas_23(Musica **lista_musicas)
 {
-    if (lista_musicas == NULL) return;
+    if (lista_musicas == NULL)
+        return;
     Musica *atual = *lista_musicas;
     while (atual != NULL)
     {
@@ -79,8 +85,7 @@ void liberar_lista_musicas_23(Musica **lista_musicas)
 
 void remover_musica_23(Musica **lista_musicas, char titulo[])
 {
-    // CUIDADO: Este trecho pressupõe que a chamada externa cuida da verificação do Album* ser NULL.
-    // O ponteiro *lista_musicas pode ser NULL (lista vazia)
+
     if (*lista_musicas == NULL)
     {
         printf("  -> AVISO: Nao ha musicas neste album para remover.\n");
@@ -89,31 +94,24 @@ void remover_musica_23(Musica **lista_musicas, char titulo[])
 
     Musica *atual = *lista_musicas;
     Musica *anterior = NULL;
-    
-    // Busca na lista de músicas (que é encadeada)
+
     while (atual != NULL && strcmp(atual->titulo, titulo) != 0)
     {
         anterior = atual;
         atual = atual->proximo;
     }
-    
-    // Não encontrou
+
     if (atual == NULL)
     {
         printf("  -> AVISO: Musica '%s' nao encontrada no album.\n", titulo);
         return;
     }
 
-    // Remoção: Atualiza o ponteiro do nó anterior ou a cabeça da lista
-    if (anterior == NULL) 
-        *lista_musicas = atual->proximo; // O ponteiro principal (cabeça) é atualizado
-    else 
+    if (anterior == NULL)
+        *lista_musicas = atual->proximo;
+    else
         anterior->proximo = atual->proximo;
 
-    // Você deve manter o controle de qtd_musicas no nó Album*, que não está aqui.
-    // Assumindo que a chamada que usa esta função cuida disso.
-    // if (album->qtd_musicas > 0) album->qtd_musicas--; 
-    
     free(atual);
     printf("  -> SUCESSO: Musica '%s' removida.\n", titulo);
 }
